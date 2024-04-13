@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    table, th, td {
+      border:1px solid black;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <h1>{% block title %} Comanda {% endblock %}</h1>
+    <br>
+
+    {% if session["user_id"] %}
+        <h2>Bienvenido DR. {{ session["nombre"] }}</h2>
+    {% endif %}
+
+    <form method="post">
+        <div class="form-group">
+            <label for="doctor">Dr.</label>
+            <input type="text" id="doctor" name="doctor">
+            <br>
+        
+            <label for="paciente">Paciente:</label>
+            <input type="text" id="paciente" name="paciente">
+
+            <label for="edad">Edad:</label>
+            <input type="number" id="edad"name="edad"><br>
+
+
+
+            <label>Forma de Cara: </label>
+            <input type="radio" id="cuadrada" name="formacara" value="Cuadrada">
+            <label for="cuadrada">Cuadrada</label>
+            <input type="radio" id="redonda" name="formacara" value="Redonda">
+            <label for="redonda">Redonda</label>
+            <input type="radio" id="oval" name="formacara" value="Oval">
+            <label for="oval">Oval</label>
+            <input type="radio" id="triangular" name="formacara" value="Triangular">
+            <label for="trinagular">Triangular</label>
+            <br>
+
+            <label for="color">Color Básico:</label>
+            <input type="text" name="color">
+            <label for="colorimetro">Colorímetro:</label>
+            <input type="text" name="colorimetro">
+            <br>
+
+            <label for="munon">Color de sustrato(Remanente dental, tono de muñon)</label>
+            <select id="munon" name="munon">
+                <option value="nd1">ND1</option>
+                <option value="nd2">ND2</option>
+                <option value="nd3">ND3</option>
+                <option value="nd4">ND4</option>
+                <option value="nd5">ND5</option>
+                <option value="nd6">ND6</option>
+                <option value="nd7">ND7</option>
+                <option value="nd8">ND8</option>
+                <option value="nd9">ND9</option>
+            </select><br>
+            
+            <table>
+                <tr>
+                    <th><label for="18">18</label></th>
+                    <th><label for="17">17</label></th>
+                    <th><label for="16">16</label></th>
+                    <th><label for="15">15</label></th>
+                    <th><label for="14">14</label></th>
+                    <th><label for="13">13</label></th>
+                    <th><label for="12">12</label></th>
+                    <th><label for="11">11</label></th>      
+                    <th><label for="21">21</label></th>
+                    <th><label for="22">22</label></th>
+                    <th><label for="23">23</label></th>
+                    <th><label for="24">24</label></th>
+                    <th><label for="25">25</label></th>
+                    <th><label for="26">26</label></th>
+                    <th><label for="27">27</label></th>
+                    <th><label for="28">28</label></th>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" id="18" value="18" name="diente"></td>
+                    <td><input type="checkbox" id="17" value="17"></td>
+                    <td><input type="checkbox" id="16" value="16"></td>
+                    <td><input type="checkbox" id="15" value="15"></td>
+                    <td><input type="checkbox" id="14" value="14"></td>
+                    <td><input type="checkbox" id="13" value="13"></td>
+                    <td><input type="checkbox" id="12" value="12"></td>
+                    <td><input type="checkbox" id="11" value="11"></td>
+                    <td><input type="checkbox" id="21" value="21"></td>
+                    <td><input type="checkbox" id="22" value="22"></td>
+                    <td><input type="checkbox" id="23" value="23"></td>
+                    <td><input type="checkbox" id="24" value="24"></td>
+                    <td><input type="checkbox" id="25" value="25"></td>
+                    <td><input type="checkbox" id="26" value="26"></td>
+                    <td><input type="checkbox" id="27" value="27"></td>
+                    <td><input type="checkbox" id="28" value="28"></td>
+                </tr>
+
+                <tr>
+                    <td><input type="checkbox" id="48" value="48"></td>
+                    <td><input type="checkbox" id="47" value="47"></td>
+                    <td><input type="checkbox" id="46" value="46"></td>
+                    <td><input type="checkbox" id="45" value="45"></td>
+                    <td><input type="checkbox" id="44" value="44"></td>
+                    <td><input type="checkbox" id="43" value="43"></td>
+                    <td><input type="checkbox" id="42" value="42"></td>
+                    <td><input type="checkbox" id="41" value="41"></td>
+                    <td><input type="checkbox" id="31" value="31"></td>
+                    <td><input type="checkbox" id="32" value="32"></td>
+                    <td><input type="checkbox" id="33" value="33"></td>
+                    <td><input type="checkbox" id="34" value="34"></td>
+                    <td><input type="checkbox" id="35" value="35"></td>
+                    <td><input type="checkbox" id="36" value="36"></td>
+                    <td><input type="checkbox" id="37" value="37"></td>
+                    <td><input type="checkbox" id="38" value="38"></td>
+                </tr>
+
+                <tr>
+                    <th><label for="48">48</label></th>
+                    <th><label for="47">47</label></th>
+                    <th><label for="46">46</label></th>
+                    <th><label for="45">45</label></th>
+                    <th><label for="44">44</label></th>
+                    <th><label for="43">43</label></th>
+                    <th><label for="42">42</label></th>
+                    <th><label for="41">41</label></th>      
+                    <th><label for="31">31</label></th>
+                    <th><label for="32">32</label></th>
+                    <th><label for="33">33</label></th>
+                    <th><label for="34">34</label></th>
+                    <th><label for="35">35</label></th>
+                    <th><label for="36">36</label></th>
+                    <th><label for="37">37</label></th>
+                    <th><label for="38">38</label></th>
+                </tr>
+            </table>
+
+
+            <a title="Kaligula, CC BY-SA 3.0 &lt;https://creativecommons.org/licenses/by-sa/3.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Human_dental_arches.svg"><img width="256" alt="Human dental arches" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Human_dental_arches.svg/256px-Human_dental_arches.svg.png">
+            </a>
+
+            <h2>Observaciones</h2>
+            <textarea style="width:75%" name="observaciones">
+
+            </textarea><br>
+
+            <label for="ceramica"><h2>Cerámica</h2></label>
+            <br>
+            <select id="ceramica" name="ceramica">
+                <option value="Metal-ceramica">Metal-cerámica</option>
+                <option value="Carilla sobre refractario">Carilla sobre refractario</option>
+                <option value="Unidad sobre implante">Unidad sobre implante</option>
+            </select>
+            <br>
+
+            <label for="porcelana"><h2>Porcelana libre de Metal</h2></label><br>
+            <input type="checkbox" id="corona" name="porcelana" value="Corona">
+            <label for="corona">Corona</label>
+            <input type="checkbox" id="carilla" name="porcelana" value="Carilla">
+            <label for="carilla">Carilla</label>
+            <input type="checkbox" id="incrustacion" name="porcelana" value="Incrustacion">
+            <label for="incrustacion">Incrustación</label>
+            <br>
+
+            <label for="zirconia"><h2>Zirconia</h2></label><br>
+            <input type="checkbox" id="monolitica" name="zirconia" value="Monolitica">
+            <label for="monolitica">Zirconia monolítica</label>
+            <input type="checkbox" id="estratificada" name="zirconia" value="Estratificada">
+            <label for="estratificada">Zirconia estratificada</label>
+            <br>
+
+            <label for="otros"><h2>Otros</h2></label><br>
+            <input type="checkbox" id="coronametalica" name="otros" value="Corona Metalica">
+            <label for="coronametalica">Corona Metálica</label>
+            <input type="checkbox" id="incrustacionmetalica" name="otros" value="Incrustacion Metalica">
+            <label for="incrustacionmetalica">Incrustación Metálica</label>
+            <input type="checkbox" id="postevaciado" name="otros" value="Poste Vaciado">
+            <label for="postevaciado">Poste Vaciado</label>
+            <input type="checkbox" id="acrilicorapido" name="otros" value="Acrilico Rapido">
+            <label for="acrilicorapido">Unidad Provisional (Acrílico Rápido)</label>
+            <input type="checkbox" id="enceradodiagnostico" name="otros" value="Encerado Diagnostico">
+            <label for="enceradodiagnostico">Encerado Diagnóstico</label>
+            <input type="checkbox" id="desprogramadora" name="otros" value="Guarda desprogramadora">
+            <label for="desprogramadora">Guarda desprogramadora</label>
+            <input type="checkbox" id="acetato" name="otros" value="Guarda de Acetato">
+            <label for="acetato">Guarda de acetato</label>
+            <input type="checkbox" id="cerometro" name="otros" value="Cerometro">
+            <label for="cerometro">Cerómetro</label>
+            <br>
+            <br>
+            <br>
+
+            <input type="submit" value="Submit">
+            
+        </div>
+        
+    </form>
+
+
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+ <h1>{% block title %}Dental Art Studio {% endblock %}</h1>
+ 
+ {% with messages = get_flashed_messages() %}
+ {% if messages %}
+    <ul class="flashes">
+     {% for message in messages %}
+         <li>{{ message }}</li>
+     {% endfor %}
+     </ul>
+ {% endif %}
+{% endwith %}
+
+
+ {% for post in posts %}
+        <a href="#">
+            <h2>{{ post['title'] }}</h2>
+        </a>
+        <span class="badge badge-primary">{{ post['created'] }}</span>
+        <hr>
+    {% endfor %}
+
+{% endblock %}
