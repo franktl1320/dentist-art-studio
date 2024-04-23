@@ -1,13 +1,8 @@
 import sqlite3
-from helpers import apology, login_required
+from helpers import apology, login_required, get_db_connection, get_user_info
 from flask import Flask, render_template, request, url_for, flash, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 
@@ -27,11 +22,12 @@ def index():
 @app.route('/comanda', methods=('GET','POST'))
 @login_required
 def comanda():
+    user = get_user_info(session["user_id"])
     if request.method == 'POST':
         doctor = request.form['doctor']
         paciente = request.form['paciente']
         return render_template('salida.html', doctor=doctor, paciente=paciente)
-    return render_template('comanda.html')
+    return render_template('comanda.html', user=user)
 
 @app.route('/login', methods=('GET','POST'))
 def login():
@@ -60,10 +56,9 @@ def login():
         
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
-        # Remember doctor's name
-        session["nombre"] = rows[0]["username"]
+       
         
-
+        flash('Login successful!')  # Aquí mostramos el mensaje flash
         return redirect("/")
         
 
@@ -77,7 +72,7 @@ def logout():
     """Log user out"""
 
     # Forget any user_id
-    user_name = session["nombre"]
+
     session.clear()
 
     # Flash a goodbye message
@@ -113,8 +108,16 @@ def register():
             db = conny.cursor()
             db.execute("INSERT INTO user (username, hash) VALUES(?,?)",
                        (request.form.get("username"), generate_password_hash(request.form.get("password"))))
+            user_id = db.lastrowid  # Aquí obtenemos el ID del usuario recién insertado
+            conny.commit()
+
+            # Ahora puedes usar user_id para insertar un nuevo doctor en la tabla doctors
+            db.execute("INSERT INTO doctors (user_id, last_name, first_name, e_mail) VALUES(?,?,?,?)",
+               (user_id, request.form.get("firstname"), request.form.get("lastname"), request.form.get("email")))
             conny.commit()
             conny.close()
+
+            flash('Registration successful!')  # Aquí mostramos el mensaje flash
             return redirect("/")
         except (KeyError, TypeError, ValueError):
             return apology("invalid username")

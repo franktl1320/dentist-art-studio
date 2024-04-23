@@ -1,10 +1,23 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS doctors;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   hash TEXT NOT NULL
+);
+
+CREATE TABLE doctors (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  title TEXT,
+  professional_license TEXT,
+  phone TEXT,
+  e_mail TEXT,
+  FOREIGN KEY (user_id) REFERENCES user (id)
 );
 
 CREATE TABLE posts (

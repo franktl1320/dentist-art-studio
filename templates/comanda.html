@@ -14,7 +14,7 @@
     <br>
 
     {% if session["user_id"] %}
-        <h2>Bienvenido DR. {{ session["nombre"] }}</h2>
+        <h2>Bienvenido DR. {{ user['last_name'] }} {{ user['first_name'] }}</h2>
     {% endif %}
 
     <form method="post">

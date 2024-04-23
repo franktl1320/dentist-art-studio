@@ -30,3 +30,21 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_user_info(user_id):
+    # Obtén la información del usuario de la base de datos
+    conny = get_db_connection()
+    db = conny.cursor()
+    user = db.execute("SELECT * FROM doctors WHERE id = ?", (user_id,)).fetchone()
+    conny.close()
+
+    # Si el usuario no existe, devuelve None
+    if user is None:
+        return None
+
+    return user
