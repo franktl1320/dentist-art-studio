@@ -70,13 +70,13 @@ def login():
 @app.route("/logout")
 def logout():
     """Log user out"""
-
+    user = get_user_info(session["user_id"])
     # Forget any user_id
 
     session.clear()
 
     # Flash a goodbye message
-    flash(f"Hasta luego,  {user_name}!")
+    flash(f"Hasta luego,  Dr. {user['last_name']}!")
 
     # Redirect user to login form
     return redirect("/")
