@@ -13,4 +13,17 @@
  {% endif %}
 {% endwith %}
 
+{% if user %}
+
+    <p class="user">Welcome, Dr. {{ user['last_name'] }} {{ user['first_name'] }}!</p>
+    <p><a href="{{ url_for('logout') }}">Log out</a></p>
+{% else %}
+    <p class="user">Welcome </p>
+    <p><a href="{{ url_for('login') }}">Log in</a> or <a href="{{ url_for('register') }}">register</a></p>
+{% endif %}
+
+
+
+
+
 {% endblock %}

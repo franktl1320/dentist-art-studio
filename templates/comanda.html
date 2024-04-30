@@ -13,7 +13,7 @@
     <h1>{% block title %} Comanda {% endblock %}</h1>
     <br>
 
-    {% if session["user_id"] %}
+    {% if user %}
         <h2>Bienvenido DR. {{ user['last_name'] }} {{ user['first_name'] }}</h2>
     {% endif %}
 

@@ -19,7 +19,7 @@ Session(app)
 
 @app.route('/')
 def index():
-    user = session.get("user_id")
+    user = session.get("user_info")
     return render_template('index.html', user=user) 
 
 
