@@ -1,28 +1,32 @@
-import sqlite3
+import os
 from helpers import apology, login_required, get_db_connection, get_user_info
 from flask import Flask, render_template, request, url_for, flash, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from flask_session import Session
 
 
 
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'llavesecreta'
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+
+# Configuración de Flask-Session
+app.config["SESSION_PERMANENT"] = False
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
+
 
 @app.route('/')
 def index():
-    conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts').fetchall()
-    conn.close()
-    return render_template('index.html', posts=posts)
+    user = session.get("user_id")
+    return render_template('index.html', user=user) 
 
 
 @app.route('/comanda', methods=('GET','POST'))
 @login_required
 def comanda():
-    user = get_user_info(session["user_id"])
+    user = session["user_info"]
     if request.method == 'POST':
         doctor = request.form['doctor']
         paciente = request.form['paciente']
@@ -56,6 +60,10 @@ def login():
         
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
+        user = get_user_info(session["user_id"])
+        user_info = dict(user)
+        session["user_info"] = user_info
+        
        
         
         flash('Login successful!')  # Aquí mostramos el mensaje flash
@@ -70,7 +78,7 @@ def login():
 @app.route("/logout")
 def logout():
     """Log user out"""
-    user = get_user_info(session["user_id"])
+    user = session["user_info"]
     # Forget any user_id
 
     session.clear()
