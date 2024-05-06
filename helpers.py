@@ -48,3 +48,15 @@ def get_user_info(user_id):
         return None
 
     return user
+
+def get_patients(user_id):
+    try:
+        conny = get_db_connection()
+        db = conny.cursor()
+        patients = db.execute("SELECT * FROM patients WHERE doctor_id = ?", (user_id,)).fetchall()
+        conny.close()
+        patients = [dict(patient) for patient in patients]
+        return patients
+    except Exception as e:
+        print(f"Error al obtener pacientes: {e}")
+        return None

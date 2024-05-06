@@ -1,5 +1,5 @@
 import os
-from helpers import apology, login_required, get_db_connection, get_user_info
+from helpers import apology, login_required, get_db_connection, get_user_info, get_patients
 from flask import Flask, render_template, request, url_for, flash, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_session import Session
@@ -20,7 +20,11 @@ Session(app)
 @app.route('/')
 def index():
     user = session.get("user_info")
-    return render_template('index.html', user=user) 
+    if user is not None:
+        patients = get_patients(session.get("user_id"))
+    else:
+        patients = []
+    return render_template('index.html', user=user, patients=patients) 
 
 
 @app.route('/comanda', methods=('GET','POST'))
@@ -67,7 +71,7 @@ def login():
        
         
         flash('Login successful!')  # Aquí mostramos el mensaje flash
-        return redirect("/")
+        return redirect(url_for('index'))
         
 
     #Via GET
@@ -78,7 +82,7 @@ def login():
 @app.route("/logout")
 def logout():
     """Log user out"""
-    user = session["user_info"]
+    user = session.get("user_info")
     # Forget any user_id
 
     session.clear()
@@ -87,7 +91,7 @@ def logout():
     flash(f"Hasta luego,  Dr. {user['last_name']}!")
 
     # Redirect user to login form
-    return redirect("/")
+    return redirect(url_for('index'))
 
 
 @app.route('/register', methods=('GET','POST'))
@@ -126,7 +130,7 @@ def register():
             conny.close()
 
             flash('Registration successful!')  # Aquí mostramos el mensaje flash
-            return redirect("/")
+            return redirect(url_for('index'))
         except (KeyError, TypeError, ValueError):
             return apology("invalid username")
 
