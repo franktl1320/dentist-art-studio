@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{% block title %} Nuevo Paciente {% endblock %}</h1>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<form method="POST" action=" {{ url_for('add_patient') }}">
+    <div class="form-group">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name">
+
+        <label for="age">Edad:</label>
+        <input type="number" id="age"name="age"><br>
+
+        <label>Forma de Cara: </label>
+        <input type="radio" id="squared" name="face_shape" value="Cuadrada">
+        <label for="squared">Cuadrada</label>
+        <input type="radio" id="round" name="face_shape" value="Redonda">
+        <label for="round">Redonda</label>
+        <input type="radio" id="oval" name="face_shape" value="Oval">
+        <label for="oval">Oval</label>
+        <input type="radio" id="triangular" name="face_shape" value="Triangular">
+        <label for="trinagular">Triangular</label>
+        <br>
+
+        <label for="basic_color">Color Básico:</label>
+        <input type="text" name="basic_color">
+        <label for="colorimeter">Colorímetro:</label>
+        <input type="text" name="colorimeter">
+        <br>
+
+        <label for="gum_color">Color de sustrato(Remanente dental, tono de muñon)</label>
+        <select id="gum_color" name="gum_color">
+            <option value="nd1">ND1</option>
+            <option value="nd2">ND2</option>
+            <option value="nd3">ND3</option>
+            <option value="nd4">ND4</option>
+            <option value="nd5">ND5</option>
+            <option value="nd6">ND6</option>
+            <option value="nd7">ND7</option>
+            <option value="nd8">ND8</option>
+            <option value="nd9">ND9</option>
+        </select><br>
+        <input type="submit" value="Agregar Paciente">
+    </div>
+</form>
+
+{% endblock %}

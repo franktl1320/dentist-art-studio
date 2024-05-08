@@ -68,7 +68,6 @@ def login():
         user_info = dict(user)
         session["user_info"] = user_info
         
-       
         
         flash('Login successful!')  # Aquí mostramos el mensaje flash
         return redirect(url_for('index'))
@@ -137,5 +136,47 @@ def register():
     # via GET #
     return render_template("register.html")
 
+
+@app.route('/add_patient', methods=('GET','POST'))
+@login_required
+def add_patient():
+    if request.method == 'POST':
+        # Aquí va el código para manejar el formulario de agregar paciente
+        #Ensure name was submitted
+        if not request.form.get('name'):
+            flash("Debe proporcionar un nombre")
+            return redirect(url_for('add_patient'))
+            
+        name = request.form['name']
+
+        #ensure age was submitted
+        if not request.form.get('age'):
+            flash("Debe proporcionar una edad")
+            return redirect(url_for('add_patient'))
+        age = request.form['age']
+
+        face_shape = request.form.get('face_shape')
+        basic_color = request.form.get('basic_color')  # Estos campos pueden ser None, así que usamos .get
+        colorimeter = request.form.get('colorimeter')
+        gum_color = request.form.get('gum_color')
+        doctor_id = session['user_id']  # Asumiendo que el id del doctor está en la sesión
+
+        try:
+            conn = get_db_connection()
+            db = conn.cursor()
+            db.execute(
+                'INSERT INTO patients (name, age, face_shape, basic_color, colorimeter, gum_color, doctor_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                (name, age, face_shape, basic_color, colorimeter, gum_color, doctor_id)
+            )
+            conn.commit()
+            conn.close()
+
+            flash('Paciente agregado exitosamente!')
+            return redirect(url_for('index'))
+        except Exception as e:
+            return apology("Ocurrió un error al agregar el paciente: " + str(e))
+    else:
+        # Si el método es GET, mostramos el formulario de agregar paciente
+        return render_template('add_patient.html')
 
 

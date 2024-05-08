@@ -15,8 +15,8 @@
 
 {% if user %}
 
-    <p class="user">Welcome, Dr. {{ user['last_name'] }} {{ user['first_name'] }}!</p>
-    <p><a href="{{ url_for('logout') }}">Log out</a></p>
+    <p class="user">¡Bienvenido, Dr.  {{ user['last_name'] }} {{ user['first_name'] }}!</p>
+    <p><a href="{{ url_for('logout') }}">Cerrar sesión</a></p>
      {% if patients %}
         <ul>
             {% for patient in patients %}
@@ -24,12 +24,12 @@
             {% endfor %}
         </ul>
     {% elif not patients %}
-        <p>No patients found</p>
+        <p>No se encontraron pacientes.</p><a href="{{ url_for('add_patient') }}">Añadir paciente</a></p>
     {% endif %}
 
 {% else %}
-    <p class="user">Welcome </p>
-    <p><a href="{{ url_for('login') }}">Log in</a> or <a href="{{ url_for('register') }}">register</a></p>
+    <p class="user">¡Bienvenidos! </p>
+    <p><a href="{{ url_for('login') }}">Iniciar sesión</a> o <a href="{{ url_for('register') }}">Registrarse</a></p>
 {% endif %}
 
 
