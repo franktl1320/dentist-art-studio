@@ -17,12 +17,58 @@
 
     <p class="user">¡Bienvenido, Dr.  {{ user['last_name'] }} {{ user['first_name'] }}!</p>
     <p><a href="{{ url_for('logout') }}">Cerrar sesión</a></p>
-     {% if patients %}
-        <ul>
-            {% for patient in patients %}
-                <li>{{ patient['name'] }} </li>
-            {% endfor %}
-        </ul>
+    
+    {% if patients %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Edad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                    <tr>
+                        <td>{{ patient['first_name'] }}</td>
+                        <td>{{ patient['last_name'] }}</td>
+                        <td>{{ patient['age'] }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            {% if jobs[patient['id']] %}
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>Dientes</th>
+                                    <th>Tipo de Dientes</th>
+                                    <th>Tipo de trabajo</th>
+                                    <th>Material</th>
+                                    <th>Opción</th>
+                                    <th>Fecha</th>
+                                    <th>STATUS</th>
+                                    <!-- Agrega aquí más columnas según los campos de la tabla 'jobs' -->
+                                </tr>
+                                {% for job in jobs[patient['id']] %}
+                                    <tr>
+                                        <td>{{ job['teeth'] }}</td>
+                                        <td>{{ job['tooth_type'] }}</td>
+                                        <td>{{ job['job_type'] }}</td>
+                                        <td>{{ job['job_material'] }}</td>
+                                        <td>{{ job['job_option'] }}</td>
+                                        <td>{{ job['timestamp'] }}</td>
+                                        <td>{{ job['status'] }}</td>
+                                        <!-- Agrega aquí más celdas según los campos de la tabla 'jobs' -->
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            {% else %}
+                                <a href="{{ url_for('add_job', patient_id=patient['id']) }}">Agregar trabajo</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% elif not patients %}
         <p>No se encontraron pacientes.</p><a href="{{ url_for('add_patient') }}">Añadir paciente</a></p>
     {% endif %}

@@ -1,5 +1,5 @@
 import os
-from helpers import apology, login_required, get_db_connection, get_user_info, get_patients
+from helpers import apology, login_required, get_db_connection, get_user_info, get_patients, get_jobs
 from flask import Flask, render_template, request, url_for, flash, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_session import Session
@@ -20,11 +20,19 @@ Session(app)
 @app.route('/')
 def index():
     user = session.get("user_info")
+    jobs = {}
     if user is not None:
         patients = get_patients(session.get("user_id"))
+
+        # check for empty list
+        if patients:
+            #gets the jobs for each patient
+            for patient in patients:
+                job = get_jobs(patient['id'])
+                jobs[patient['id']] = job
     else:
         patients = []
-    return render_template('index.html', user=user, patients=patients) 
+    return render_template('index.html', user=user, patients=patients, jobs=jobs) 
 
 
 @app.route('/comanda', methods=('GET','POST'))
@@ -47,11 +55,13 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("must provide username")
+            flash("Debe proporcionar un nombre de usuario")
+            return redirect(url_for('login'))
         
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password")
+            flash("Debe proporcionar una contraseña")
+            return redirect(url_for('login'))
         
         # Query database for username
         db = get_db_connection()
@@ -143,18 +153,22 @@ def add_patient():
     if request.method == 'POST':
         # Aquí va el código para manejar el formulario de agregar paciente
         #Ensure name was submitted
-        if not request.form.get('name'):
+        if not request.form.get('first_name'):
             flash("Debe proporcionar un nombre")
             return redirect(url_for('add_patient'))
             
-        name = request.form['name']
+        first_name = request.form['first_name']
+
+        if not request.form.get('last_name'):
+            flash("Debe proporcionar un apellido")
+            return redirect(url_for('add_patient'))
+        last_name = request.form['last_name']
 
         #ensure age was submitted
         if not request.form.get('age'):
             flash("Debe proporcionar una edad")
             return redirect(url_for('add_patient'))
-        age = request.form['age']
-
+        age = request.form['age']       
         face_shape = request.form.get('face_shape')
         basic_color = request.form.get('basic_color')  # Estos campos pueden ser None, así que usamos .get
         colorimeter = request.form.get('colorimeter')
@@ -165,8 +179,8 @@ def add_patient():
             conn = get_db_connection()
             db = conn.cursor()
             db.execute(
-                'INSERT INTO patients (name, age, face_shape, basic_color, colorimeter, gum_color, doctor_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                (name, age, face_shape, basic_color, colorimeter, gum_color, doctor_id)
+                'INSERT INTO patients (first_name, last_name, age, face_shape, basic_color, colorimeter, gum_color, doctor_id) VALUES (?,?,?, ?, ?, ?, ?, ?)',
+                (first_name, last_name, age, face_shape, basic_color, colorimeter, gum_color, doctor_id)
             )
             conn.commit()
             conn.close()
@@ -180,3 +194,45 @@ def add_patient():
         return render_template('add_patient.html')
 
 
+@app.route('/add_job/<int:patient_id>', methods=('GET','POST'))
+@login_required
+def add_job(patient_id):
+    job_type_list = ['Corona', 'Carilla', 'Incrustación', 'Encerado']
+    job_material_list =['Metal-Cerámica', 'E-Max', 'Zirconia', 'Ceromero', 'P.M.M.A.']
+    patients = get_patients(session.get("user_id"))
+    patient = next((patient for patient in patients if patient['id'] == patient_id), None) 
+    # Verificar si el paciente es "falsy"
+    if not patient:
+        flash('El paciente no existe o no es válido')
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        teeth = request.form.getlist('teeth')
+        if not teeth:
+            flash('Debe seleccionar al menos un diente')
+            return redirect(url_for('add_job', patient_id=patient_id))
+        teeth_string = ', '.join(teeth)
+
+        comments = request.form.get('comments')
+        tooth_type = request.form.get('tooth_type')
+        job_type = request.form.get('job_type')
+        job_material = request.form.get('job_material')
+        job_option = request.form.get('job_option')
+        status = f'Recibido'
+
+
+
+        try:
+            conn = get_db_connection()
+            db = conn.cursor()
+            db.execute(
+                'INSERT INTO jobs (teeth, patient_id,comments, tooth_type, job_type, job_material, job_option, status ) VALUES (?,?,?,?,?,?,?,?)',
+                (teeth_string, patient_id, comments, tooth_type, job_type, job_material,job_option, status)
+            )
+            conn.commit()
+            conn.close()
+            flash('Trabajo agregado exitosamente!')
+            return redirect(url_for('index'))
+        except Exception as e:
+            print(f"Ocurrio un eror: {e}")
+            return apology("Ocurrió un error al agregar el trabajo")
+    return render_template('add_job.html', patient=patient, job_type_list=job_type_list, job_material_list=job_material_list)

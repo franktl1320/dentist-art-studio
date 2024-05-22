@@ -60,3 +60,17 @@ def get_patients(user_id):
     except Exception as e:
         print(f"Error al obtener pacientes: {e}")
         return None
+    
+
+
+def get_jobs(patient_id):
+    try:
+        conny = get_db_connection()
+        db = conny.cursor()
+        jobs = db.execute("SELECT * FROM jobs WHERE patient_id = ?", (patient_id,)).fetchall()
+        conny.close()
+        jobs = [dict(job) for job in jobs]
+        return jobs
+    except Exception as e:
+        print(f"Error al obtener trabajos: {e}")
+    return None
