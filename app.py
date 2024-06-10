@@ -150,6 +150,8 @@ def register():
 @app.route('/add_patient', methods=('GET','POST'))
 @login_required
 def add_patient():
+    GUM_COLOR_OPTIONS = ['ND1', 'ND2', 'ND3', 'ND4', 'ND5', 'ND6', 'ND7', 'ND8', 'ND9']
+    COLORIMETER_OPTIONS = ['A1', 'A2', 'A3', 'A3.5', 'A4', 'B1', 'B2', 'B3', 'B4', 'C1', 'C2', 'C3', 'C4', 'D2', 'D3', 'D4']
     if request.method == 'POST':
         # Aquí va el código para manejar el formulario de agregar paciente
         #Ensure name was submitted
@@ -191,14 +193,14 @@ def add_patient():
             return apology("Ocurrió un error al agregar el paciente: " + str(e))
     else:
         # Si el método es GET, mostramos el formulario de agregar paciente
-        return render_template('add_patient.html')
+        return render_template('add_patient.html', colorimeter_options=COLORIMETER_OPTIONS, gum_color_options=GUM_COLOR_OPTIONS)
 
 
 @app.route('/add_job/<int:patient_id>', methods=('GET','POST'))
 @login_required
 def add_job(patient_id):
-    job_type_list = ['Corona', 'Carilla', 'Incrustación', 'Encerado']
-    job_material_list =['Metal-Cerámica', 'E-Max', 'Zirconia', 'Ceromero', 'P.M.M.A.']
+    JOB_TYPE_LIST = ['Corona', 'Carilla', 'Incrustación', 'Encerado']
+    JOB_MATERIAL_LIST =['Metal-Cerámica', 'E-Max', 'Zirconia', 'Ceromero', 'P.M.M.A.']
     patients = get_patients(session.get("user_id"))
     patient = next((patient for patient in patients if patient['id'] == patient_id), None) 
     # Verificar si el paciente es "falsy"
@@ -218,9 +220,6 @@ def add_job(patient_id):
         job_material = request.form.get('job_material')
         job_option = request.form.get('job_option')
         status = f'Recibido'
-
-
-
         try:
             conn = get_db_connection()
             db = conn.cursor()
@@ -235,4 +234,4 @@ def add_job(patient_id):
         except Exception as e:
             print(f"Ocurrio un eror: {e}")
             return apology("Ocurrió un error al agregar el trabajo")
-    return render_template('add_job.html', patient=patient, job_type_list=job_type_list, job_material_list=job_material_list)
+    return render_template('add_job.html', patient=patient, job_type_list=JOB_TYPE_LIST, job_material_list=JOB_MATERIAL_LIST)

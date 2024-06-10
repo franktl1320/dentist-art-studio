@@ -22,6 +22,7 @@
 
         <label for="age">Edad:</label>
         <input type="number" id="age"name="age">
+        <br>
 
         <label>Forma de Cara: </label>
         <input type="radio" id="squared" name="face_shape" value="Cuadrada">
@@ -36,24 +37,23 @@
 
         <label for="basic_color">Color Básico:</label>
         <input type="text" name="basic_color">
-        <label for="colorimeter">Colorímetro:</label>
-        <input type="text" name="colorimeter">
         <br>
-
+        <label for="colorimeter">Colorímetro:</label>
+        <select name="colorimeter" id="colorimeter">
+            <option value="" hidden selected>Selecciona una opción</option>
+            {% for option in colorimeter_options %}
+            <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+        </select>
+        <br>
         <label for="gum_color">Color de sustrato(Remanente dental, tono de muñon)</label>
         <select id="gum_color" name="gum_color">
-            <option value="nd1">ND1</option>
-            <option value="nd2">ND2</option>
-            <option value="nd3">ND3</option>
-            <option value="nd4">ND4</option>
-            <option value="nd5">ND5</option>
-            <option value="nd6">ND6</option>
-            <option value="nd7">ND7</option>
-            <option value="nd8">ND8</option>
-            <option value="nd9">ND9</option>
-        </select><br>
-        <input type="submit" value="Agregar Paciente">
-    </div>
-</form>
+            <option value="" hidden selected>Selecciona una opción</option>
+            {% for option in gum_color_options %}
+                <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Enviar">
 
 {% endblock %}
