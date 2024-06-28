@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS doctors;
 DROP TABLE IF EXISTS patients;
+DROP TABLE IF EXISTS uploads;
 DROP TABLE IF EXISTS jobs;
 
 CREATE TABLE user (
@@ -35,6 +36,13 @@ CREATE TABLE patients (
     FOREIGN KEY (doctor_id) REFERENCES doctors (id)
 );
 
+CREATE TABLE uploads (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  patient_id INTEGER,
+  filename TEXT NOT NULL,
+  FOREIGN KEY (patient_id) REFERENCES patients (id)
+);
+
 CREATE TABLE jobs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   patient_id INTEGER,
@@ -46,7 +54,9 @@ CREATE TABLE jobs (
   timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   comments TEXT,
   status TEXT,
-  FOREIGN KEY (patient_id) REFERENCES patients (id)
+  upload_id INTEGER,
+  FOREIGN KEY (patient_id) REFERENCES patients (id),
+  FOREIGN KEY (upload_id) REFERENCES uploads (id)
 );
 
 

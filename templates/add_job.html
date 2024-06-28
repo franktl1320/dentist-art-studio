@@ -1,16 +1,22 @@
-{% extends "base.html" %}
 
-{% block content %}
-    <h1>{% block title %}Nuevo Trabajo{% endblock %}</h1>
+
+    <h1>Nuevo Trabajo</h1>
     <br>
     <h2>Trabajo para el paciente: {{ patient.first_name  }} {{ patient.last_name }}</h2>
     <br>
     <p>Doctor: {{ session['user_info']['first_name'] }} {{ session['user_info']['last_name'] }}</p>
-
-
+    <br>
+    <script type="module" src="{{ url_for('static', filename='js/stl-viewer/stl-viewer.js') }}"></script>
+    <div>
+        <p> Nombre del archivo: {{ filename }}</p>
+        <br>
+        <stl-viewer model="{{ url_for('static', filename='uploads/' + filename) }}"></stl-viewer>
+        <p> URL del archivo: {{ url_for('static', filename='uploads/' + filename) }}</p>
+        <br>
+        <p> numero de id de upload: {{ upload_id }}</p>
+    </div>
     <form method="post">
         <div class="form-group">
-
             <table>
                 <tr>
                     <th><label for="18">18</label></th>
@@ -136,4 +142,3 @@
         </div>
     </form>
    
-{% endblock %}

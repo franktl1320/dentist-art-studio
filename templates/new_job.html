@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% block title %}Nuevo Trabajo{% endblock %}</h1>
+
+<form action="{{ url_for('new_job') }}" method="post" enctype="multipart/form-data">
+    {% if selected_patient %}
+        <input type="hidden" name="patient" value="{{ selected_patient.id }}">
+        <p>Nombre: {{ selected_patient.first_name }}</p>
+        <p>Apellido: {{ selected_patient.last_name }}</p>
+    {% else %}
+        <select name="patient">
+            <option value="" selected>Selecciona un paciente</option>
+            {% for p in patients %}
+                <option value="{{ p.id }}">{{ p.first_name }} {{ p.last_name }}</option>
+            {% endfor %}
+        </select>
+         O <a href="{{ url_for('add_patient') }}">Agrega paciente nuevo</a>
+    {% endif %}
+    <br>
+    <br>
+    <input type="file" name="file">
+    <input type="submit" value="Subir">
+</form>
+
+{% endblock %}

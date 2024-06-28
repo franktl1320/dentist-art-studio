@@ -1,0 +1,13 @@
+
+<h1>Preview Screen</h1>
+<script type="module" src="{{ url_for('static', filename='js/stl-viewer/stl-viewer.js') }}"></script>
+<div>
+    {% for file_url, download_url, filename in file_data %}
+        <div>
+            <!-- Aquí iría tu código para mostrar una vista previa del archivo en file_url -->
+            <p>{{ filename }}</p>
+            <stl-viewer model="{{ file_url }}"></stl-viewer>
+            <a href="{{ download_url }}">Descarga el archivo</a>.
+        </div>
+    {% endfor %}
+</div>

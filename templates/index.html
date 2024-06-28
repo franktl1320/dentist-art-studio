@@ -45,6 +45,7 @@
                                     <th>Material</th>
                                     <th>Opción</th>
                                     <th>Fecha</th>
+                                    <th>upload id</th>
                                     <th>STATUS</th>
                                     <!-- Agrega aquí más columnas según los campos de la tabla 'jobs' -->
                                 </tr>
@@ -56,13 +57,14 @@
                                         <td>{{ job['job_material'] }}</td>
                                         <td>{{ job['job_option'] }}</td>
                                         <td>{{ job['timestamp'] }}</td>
+                                        <td>{{ job['upload_id'] }}</td>
                                         <td>{{ job['status'] }}</td>
                                         <!-- Agrega aquí más celdas según los campos de la tabla 'jobs' -->
                                     </tr>
                                 {% endfor %}
                             </table>
                             {% else %}
-                                <a href="{{ url_for('add_job', patient_id=patient['id']) }}">Agregar trabajo</a>
+                                <a href="{{ url_for('new_job', patient_id=patient['id']) }}">Agregar trabajo</a>
                             {% endif %}
                         </td>
                     </tr>
