@@ -1,0 +1,3 @@
+[submodule "static/js/stl-viewer"]
+	path = static/js/stl-viewer
+	url = https://github.com/ottobonn/stl-viewer.git
