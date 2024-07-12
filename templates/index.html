@@ -28,7 +28,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for patient in patients %}
+                {% for patient in patients|reverse %}
                     <tr>
                         <td>{{ patient['first_name'] }}</td>
                         <td>{{ patient['last_name'] }}</td>
@@ -36,7 +36,7 @@
                     </tr>
                     <tr>
                         <td colspan="6">
-                            {% if jobs[patient['id']] %}
+                            {% if jobs_per_patient[patient['id']] %}
                             <table class="table table-striped">
                                 <tr>
                                     <th>Dientes</th>
@@ -45,11 +45,10 @@
                                     <th>Material</th>
                                     <th>Opción</th>
                                     <th>Fecha</th>
-                                    <th>upload id</th>
                                     <th>STATUS</th>
                                     <!-- Agrega aquí más columnas según los campos de la tabla 'jobs' -->
                                 </tr>
-                                {% for job in jobs[patient['id']] %}
+                                {% for job in jobs_per_patient[patient['id']] %}
                                     <tr>
                                         <td>{{ job['teeth'] }}</td>
                                         <td>{{ job['tooth_type'] }}</td>
@@ -57,9 +56,30 @@
                                         <td>{{ job['job_material'] }}</td>
                                         <td>{{ job['job_option'] }}</td>
                                         <td>{{ job['timestamp'] }}</td>
-                                        <td>{{ job['upload_id'] }}</td>
                                         <td>{{ job['status'] }}</td>
                                         <!-- Agrega aquí más celdas según los campos de la tabla 'jobs' -->
+                                    </tr>
+                                    <tr>
+                                        <th>Comentarios</th>
+                                        <th>Archivos</th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {{ job['comments']}}
+                                        </td>
+                                        <td>
+                                            {% for file in job['files'] %}
+                                               <p>{{ file['filename'] }}</p>
+                                               <p>{{ file['file_type'] }}</p>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                               
+                                    <tr>
+                                        <td colspan="7">
+                                            <a href="#">Editar</a>
+                                            <a href="#">Eliminar</a>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </table>

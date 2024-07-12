@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS doctors;
 DROP TABLE IF EXISTS patients;
 DROP TABLE IF EXISTS uploads;
 DROP TABLE IF EXISTS jobs;
+DROP TABLE IF EXISTS job_uploads;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,14 +39,15 @@ CREATE TABLE patients (
 
 CREATE TABLE uploads (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  patient_id INTEGER,
+  patient_id INTEGER NOT NULL,
   filename TEXT NOT NULL,
+  file_type TEXT NOT NULL,
   FOREIGN KEY (patient_id) REFERENCES patients (id)
 );
 
 CREATE TABLE jobs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  patient_id INTEGER,
+  patient_id INTEGER NOT NULL,
   teeth TEXT NOT NULL,
   tooth_type TEXT,
   job_type TEXT,
@@ -54,9 +56,15 @@ CREATE TABLE jobs (
   timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   comments TEXT,
   status TEXT,
-  upload_id INTEGER,
-  FOREIGN KEY (patient_id) REFERENCES patients (id),
-  FOREIGN KEY (upload_id) REFERENCES uploads (id)
+  FOREIGN KEY (patient_id) REFERENCES patients (id)
+);
+
+CREATE TABLE job_uploads (
+  job_id INTEGER NOT NULL,
+  upload_id INTEGER NOT NULL,
+  PRIMARY KEY (job_id, upload_id),
+  FOREIGN KEY (job_id) REFERENCES jobs(id),
+  FOREIGN KEY (upload_id) REFERENCES uploads(id)
 );
 
 

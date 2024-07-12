@@ -7,14 +7,20 @@
     <p>Doctor: {{ session['user_info']['first_name'] }} {{ session['user_info']['last_name'] }}</p>
     <br>
     <script type="module" src="{{ url_for('static', filename='js/stl-viewer/stl-viewer.js') }}"></script>
+    {% for file_info in uploaded_files_info %}
     <div>
-        <p> Nombre del archivo: {{ filename }}</p>
-        <br>
-        <stl-viewer model="{{ url_for('static', filename='uploads/' + filename) }}"></stl-viewer>
-        <p> URL del archivo: {{ url_for('static', filename='uploads/' + filename) }}</p>
-        <br>
-        <p> numero de id de upload: {{ upload_id }}</p>
+        <p>Nombre del archivo: {{ file_info['filename'] }}</p>
+        <p>Tipo de archivo: {{ file_info['file_type'] }}</p>
+        {% if file_info['file_type'] == 'stl' %}
+            <stl-viewer model="{{ url_for('static', filename='uploads/' + file_info['filename']) }}"></stl-viewer>
+            <p>URL del archivo: {{ url_for('static', filename='uploads/' + file_info['filename']) }}</p>
+        {% elif file_info['file_type'] == 'image' %}
+            <img src="{{ url_for('static', filename='uploads/' + file_info['filename']) }}" alt="Imagen del archivo">
+            <p>URL del archivo: {{ url_for('static', filename='uploads/' + file_info['filename']) }}</p>
+        {% endif %}
     </div>
+    <br>
+{% endfor %}
     <form method="post">
         <div class="form-group">
             <table>

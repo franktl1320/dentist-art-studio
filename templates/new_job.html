@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
+
 <h1>{% block title %}Nuevo Trabajo{% endblock %}</h1>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+   <ul class="flashes">
+    {% for message in messages %}
+        <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+{% endwith %}
 
 <form action="{{ url_for('new_job') }}" method="post" enctype="multipart/form-data">
     {% if selected_patient %}
@@ -18,7 +29,7 @@
     {% endif %}
     <br>
     <br>
-    <input type="file" name="file">
+    <input type="file" name="files" multiple>
     <input type="submit" value="Subir">
 </form>
 

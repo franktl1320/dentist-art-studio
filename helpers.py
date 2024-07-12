@@ -74,3 +74,13 @@ def get_jobs(patient_id):
     except Exception as e:
         print(f"Error al obtener trabajos: {e}")
     return None
+
+def get_files_by_job_id(job_id):
+    # Aquí deberías implementar la lógica para obtener los archivos de la base de datos
+    # basado en el job_id. Este es un ejemplo de cómo podría verse la función.
+    conn = get_db_connection()
+    db = conn.cursor()
+    db.execute('SELECT * FROM job_uploads JOIN uploads ON job_uploads.upload_id = uploads.id WHERE job_uploads.job_id = ?', (job_id,))
+    files = db.fetchall()
+    conn.close()
+    return files

@@ -1,12 +1,13 @@
 import os
-from helpers import apology, login_required, get_db_connection, get_user_info, get_patients, get_jobs
+from helpers import apology, login_required, get_db_connection, get_user_info, get_patients, get_jobs, get_files_by_job_id
 from flask import Flask, render_template, request, url_for, flash, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from flask_session import Session
 
 UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'stl'}
+IMAGE_ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+STL_ALLOWED_EXTENSIONS = {'stl'}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
@@ -21,7 +22,7 @@ Session(app)
 @app.route('/')
 def index():
     user = session.get("user_info")
-    jobs = {}
+    jobs_per_patient = {}
     if user is not None:
         patients = get_patients(session.get("user_id"))
 
@@ -29,11 +30,14 @@ def index():
         if patients:
             #gets the jobs for each patient
             for patient in patients:
-                job = get_jobs(patient['id'])
-                jobs[patient['id']] = job
+                jobs = get_jobs(patient['id'])
+                for job in jobs:
+                    files = get_files_by_job_id(job['id'])
+                    job['files'] = files
+                jobs_per_patient[patient['id']] = jobs
     else:
         patients = []
-    return render_template('index.html', user=user, patients=patients, jobs=jobs) 
+    return render_template('index.html', user=user, patients=patients, jobs_per_patient=jobs_per_patient) 
 
 
 @app.route('/comanda', methods=('GET','POST'))
@@ -204,13 +208,16 @@ def add_job(patient_id):
     JOB_MATERIAL_LIST =['Metal-Cerámica', 'E-Max', 'Zirconia', 'Ceromero', 'P.M.M.A.']
     patients = get_patients(session.get("user_id"))
     patient = next((patient for patient in patients if patient['id'] == patient_id), None) 
+    uploaded_files_info = session.get('uploaded_files_info', [])
     # Verificar si el paciente es "falsy"
     if not patient:
         flash('El paciente no existe o no es válido')
         return redirect(url_for('index'))
-    filename = request.args.get('filename')
-    upload_id = request.args.get('upload_id')
+    
     if request.method == 'POST':
+        # Eliminar la clave 'uploaded_files_info' de la sesión al inicio del POST
+        session.pop('uploaded_files_info', None)
+        
         teeth = request.form.getlist('teeth')
         if not teeth:
             flash('Debe seleccionar al menos un diente')
@@ -223,26 +230,60 @@ def add_job(patient_id):
         job_material = request.form.get('job_material')
         job_option = request.form.get('job_option')
         status = f'Recibido'
+        upload_ids = []
+        try:
+            conn = get_db_connection()
+            db = conn.cursor()
+            for file_info in uploaded_files_info:
+                db.execute(
+                    'INSERT INTO uploads (patient_id, filename, file_type) VALUES (?,?,?)',
+                    (patient_id, file_info['filename'], file_info['file_type'])
+                )
+                upload_id = db.lastrowid
+                upload_ids.append(upload_id)
+                conn.commit()
+        except Exception as e:
+            print(f"Ocurrio un eror: {e}")
+            return apology("Ocurrió un error al agregar la información del archivo.")
+        finally:
+            conn.close()        
+
         try:
             conn = get_db_connection()
             db = conn.cursor()
             db.execute(
-                'INSERT INTO jobs (teeth, patient_id,comments, tooth_type, job_type, job_material, job_option, status, upload_id ) VALUES (?,?,?,?,?,?,?,?,?)',
-                (teeth_string, patient_id, comments, tooth_type, job_type, job_material,job_option, status, upload_id)
+                'INSERT INTO jobs (teeth, patient_id,comments, tooth_type, job_type, job_material, job_option, status ) VALUES (?,?,?,?,?,?,?,?)',
+                (teeth_string, patient_id, comments, tooth_type, job_type, job_material,job_option, status)
             )
+            job_id = db.lastrowid
             conn.commit()
-            conn.close()
-            flash('Trabajo agregado exitosamente!')
-            return redirect(url_for('index'))
         except Exception as e:
             print(f"Ocurrio un eror: {e}")
             return apology("Ocurrió un error al agregar el trabajo")
-    return render_template('add_job.html', patient=patient, job_type_list=JOB_TYPE_LIST, job_material_list=JOB_MATERIAL_LIST, filename=filename, upload_id=upload_id)
+        finally:
+            conn.close()
+        try:
+            conn = get_db_connection()
+            db = conn.cursor()
+            for upload_id in upload_ids:
+                db.execute(
+                    'INSERT INTO job_uploads (job_id, upload_id) VALUES (?,?)',
+                    (job_id, upload_id)
+                )
+                conn.commit()
+        except Exception as e:
+            print(f"Ocurrio un eror: {e}")
+            return apology("Ocurrió un error al agregar la información del archivo.")
+        finally:
+            conn.close()
+        flash('Trabajo agregado exitosamente!')
+        return redirect(url_for('index'))
+    return render_template('add_job.html', patient=patient, job_type_list=JOB_TYPE_LIST, job_material_list=JOB_MATERIAL_LIST,uploaded_files_info=uploaded_files_info)
 
 
-def allowed_file(filename):
+def allowed_file(filename, allowed_extensions):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
 @app.route('/new_job', defaults={'patient_id': None}, methods=('GET','POST'))
@@ -259,45 +300,48 @@ def new_job(patient_id):
         
         # Aquí puedes manejar la subida del archivo
         # check if the post request has the file part
-        if 'file' not in request.files:
+        if 'files' not in request.files:
             flash('No se encontró el archivo')
             return redirect(url_for('new_job', patient_id=patient_id))
-        file = request.files['file']
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if file.filename == '':
-            flash('No se seleccionó ningún archivo')
-            return redirect(url_for('new_job', patient_id=patient_id))
         
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        files = request.files.getlist('files')
 
-        try:
-            conn = get_db_connection()
-            db = conn.cursor()
-            db.execute(
-                'INSERT INTO uploads (patient_id, filename) VALUES (?,?)',
-                (patient_id, filename)
-            )
-            upload_id = db.lastrowid  # Captura el ID del último registro insertado
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            print(f"Ocurrio un eror: {e}")
-            return apology("Ocurrió un error al agregar el archivo")
-           
-        return redirect(url_for('add_job', patient_id=patient_id, filename=filename, upload_id=upload_id))
+
+        for file in files:
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if file.filename == '':
+                flash('No se seleccionó ningún archivo')
+                return redirect(url_for('new_job', patient_id=patient_id))
+            
+            if 'uploaded_files_info' not in session:
+                session['uploaded_files_info'] = []
+
+            # Para cada archivo subido, agrega su información a la sesión
+            if file and allowed_file(file.filename, STL_ALLOWED_EXTENSIONS):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file_type = 'stl'
+                session['uploaded_files_info'].append({'filename': filename, 'file_type': file_type})
+                session.modified = True
+            elif file and allowed_file(file.filename, IMAGE_ALLOWED_EXTENSIONS):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file_type = 'image'
+                session['uploaded_files_info'].append({'filename': filename, 'file_type': file_type})
+                session.modified = True
+        flash('Archivos subidos exitosamente!')
+        return redirect(url_for('add_job', patient_id=patient_id))
     return render_template('new_job.html', patients=patients, selected_patient=selected_patient)
 
 from flask import send_from_directory
 
-@app.route('/download_stl/<name>')
-def download_stl(name):
+@app.route('/download/<name>')
+def download(name):
     return send_from_directory(app.config["UPLOAD_FOLDER"], name)
 
-@app.route('/preview_stl')
-def preview_stl_files():
+#@app.route('/preview_stl')
+#def preview_stl_files():
     stl_files = os.listdir(app.config["UPLOAD_FOLDER"])
     stl_file_urls = [url_for('static', filename=os.path.join('uploads/', name)) for name in stl_files]
     stl_download_urls = [url_for('download_stl', name=name) for name in stl_files]
