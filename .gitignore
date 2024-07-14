@@ -2,3 +2,5 @@ environments/
 __pycache__/
 .hintrc
 flask_session/
+uploads/*
+!uploads/.gitkeep
