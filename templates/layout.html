@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- My styles-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+
+
+    <title>{% block title %} {% endblock %}</title>
+    {% block head %} {% endblock %}
+  </head>
+
+
+  <body>
+    <nav>
+        <a  href="{{ url_for('index')}}">Dental Art Studio</a>
+        <button  type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""></span>
+        </button>
+        <div class="" id="navbarNav">
+            {% if session["user_id"] %}
+            <ul class="">
+              <li class=""><a class="" href="{{ url_for('add_patient') }}">Nuevo Paciente</a></li>
+              <li class=""><a class="" href="{{ url_for('new_job') }}">Nuevo Trabajo</a></li>
+              <li class=""><a class="" href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+            </ul>
+
+
+            {% else %}
+            <ul class="">
+              <li class=""><a class="" href="{{ url_for('register') }}">Registrarse</a></li>
+              <li class=""><a class="" href="{{ url_for('login') }}">Iniciar sesión</a></li>
+            </ul>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+      {% block content %} {% endblock %}
+    </div>
+
+  </body>
+</html>

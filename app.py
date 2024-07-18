@@ -292,6 +292,7 @@ def allowed_file(filename, allowed_extensions):
 def new_job(patient_id):
     patients = get_patients(session.get("user_id"))
     selected_patient = next((p for p in patients if p['id'] == patient_id), None) if patient_id else None
+    session.pop('uploaded_files_info', None)
     if request.method == 'POST':
         patient_id = request.form.get('patient')
         if not patient_id:

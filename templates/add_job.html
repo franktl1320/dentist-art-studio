@@ -1,6 +1,8 @@
 
 
-    <h1>Nuevo Trabajo</h1>
+{% block content %}
+
+    <h1>{% block title %}Nuevo Trabajo{% endblock %}</h1>
     <br>
     <h2>Trabajo para el paciente: {{ patient.first_name  }} {{ patient.last_name }}</h2>
     <br>
@@ -148,3 +150,4 @@
         </div>
     </form>
    
+{% endblock %}
