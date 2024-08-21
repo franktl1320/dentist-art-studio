@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{% block title %}Vista Previa{% endblock %}</h1>
+    <script type="module" src="{{ url_for('static', filename='js/stl-viewer/stl-viewer.js') }}"></script>
+    <h2>Archivos:</h2>
+    <div class="container">
+        {% for file in files %}
+        <div class="full-img">
+            {% if file.file_type == 'stl' %}
+            <stl-viewer model="{{ url_for('static', filename='uploads/' + file.filename) }}"></stl-viewer>
+            {% elif file.file_type == 'image' %}
+            <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" alt="Imagen del archivo">
+            {% endif %}
+            <p>{{ file.filename }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <h2>Dientes:</h2>
+    <table>
+        <tr>
+            {% for tooth in upper_jaw %}
+            <th><label for="{{ tooth }}">{{ tooth }}</label></th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for tooth in upper_jaw %}
+            <td><input type="checkbox" id="{{ tooth }}" value="{{ tooth }}" name="teeth" {% if tooth in checked_teeth %} checked disabled {% else %} disabled {% endif %}></td>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for tooth in lower_jaw %}
+            <td><input type="checkbox" id="{{ tooth }}" value="{{ tooth }}" name="teeth" {% if tooth in checked_teeth %} checked disabled {% else %} disabled {% endif %}></td>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for tooth in lower_jaw %}
+            <th><label for="{{ tooth }}">{{ tooth }}</label></th>
+            {% endfor %}
+        </tr>
+    </table>
+    <h2>Tipo de diente:</h2>
+    <p>{{ job.tooth_type }}</p>
+    <h2>Tipo de trabajo:</h2>
+    <p>{{ job.job_type }}</p>
+    <h2>Material de trabajo:</h2>
+    <p>{{ job.job_material }}</p>
+    <h2>Opción de trabajo:</h2>
+    <p>{{ job.job_option }}</p>
+    <h2>Observaciones:</h2>
+    <p>{{ job.comments }}</p>
+    <h2>Día envidado:</h2>
+    <p>{{ job.timestamp }}</p>
+    <h2>STATUS/ Fecha de entrega: </h2>
+    <p>{{ job.status }}</p>
+{% endblock %}

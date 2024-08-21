@@ -1,16 +1,14 @@
 <!doctype html>
 <html lang="es">
   <head>
+    {% block head %}
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!-- My styles-->
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
-
-
     <title>{% block title %} {% endblock %}</title>
-    {% block head %} {% endblock %}
+     {% endblock %}
   </head>
 
 
@@ -37,9 +35,8 @@
             {% endif %}
         </div>
     </nav>
-    <div class="container">
-      {% block content %} {% endblock %}
-    </div>
-
+    {% block content %} 
+    
+    {% endblock %}
   </body>
 </html>

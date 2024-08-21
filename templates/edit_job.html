@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Edit Job{% endblock %}
+{% block content %}
+    <h1>Editar</h1>
+    <p>Welcome to the home page!</p>
+    <script type="module" src="{{ url_for('static', filename='js/stl-viewer/stl-viewer.js') }}"></script>
+    <div class="container">
+        {% for file in files %}
+        <div class="full-img">
+            {% if file.file_type == 'stl' %}
+            <stl-viewer model="{{ url_for('static', filename='uploads/' + file.filename) }}"></stl-viewer>
+            {% elif file.file_type == 'image' %}
+            <img src="{{ url_for('static', filename='uploads/' + file.filename) }}" alt="Imagen del archivo">
+            {% endif %}
+            <p>{{ file.filename }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <form method="post">
+        <table>
+            <tr>
+                {% for tooth in upper_jaw %}
+                <th><label for="{{ tooth }}">{{ tooth }}</label></th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for tooth in upper_jaw %}
+                <td><input type="checkbox" id="{{ tooth }}" value="{{ tooth }}" name="teeth" {% if tooth in checked_teeth %} checked {% endif %}></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for tooth in lower_jaw %}
+                <td><input type="checkbox" id="{{ tooth }}" value="{{ tooth }}" name="teeth" {% if tooth in checked_teeth %} checked {% endif %}></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for tooth in lower_jaw %}
+                <th><label for="{{ tooth }}">{{ tooth }}</label></th>
+                {% endfor %}
+            </tr>
+        </table>
+        <label for="tooth_type">Tipo de diente:</label>
+        <select class="form-control" id="tooth_type" name="tooth_type">
+            <option value="" hidden>Selecciona una opción</option>
+            <option value="Natural" {% if job.tooth_type == 'Natural' %}selected{% endif %}>Natural</option>
+            <option value="Implante"{% if job.tooth_type == 'Implante' %}selected{% endif %}>Implante</option>
+        </select>
+        <label for="job_type">Tipo de trabajo:</label>
+        <select class="form-control" id="job_type" name="job_type">
+            <option value="" hidden selected>Selecciona una opción</option>
+            {% for job_type in job_type_list %}
+            <option value="{{ job_type }}"{% if job.job_type == job_type %}selected{% endif %}>{{ job_type }}</option>
+            {% endfor %}
+        </select>
+        <label for="job_material">Material de trabajo:</label>
+        <select class="form-control" id="job_material" name="job_material">
+            <option value="" hidden selected>Selecciona una opción</option>
+            {% for job_material in job_material_list %}
+            <option value="{{ job_material }}"{% if job.job_material == job_material %}selected{% endif %}>{{ job_material }}</option>
+            {% endfor %}
+        </select>
+        <label for="job_option">Opción de trabajo:</label>
+        <select class="form-control" id="job_option" name="job_option">
+            <option value="" hidden selected>Selecciona una opción</option>
+            <option value="Monolítico"{% if job.job_option == 'Monolítico' %}selected{% endif %}>Monolítico</option>
+            <option value="Estratificado"{% if job.job_option == 'Estratificado' %}selected {% endif %}>Estratificado</option>
+        </select>
+        <label for="comments">Comentarios:</label>
+        <textarea class="form-control" id="comments" name="comments" rows="3">{{ job.comments }}</textarea>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+{% endblock %}

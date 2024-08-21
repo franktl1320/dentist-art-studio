@@ -1,28 +1,28 @@
-
+{% extends "layout2.html" %}
 
 {% block content %}
 
-    <h1>{% block title %}Nuevo Trabajo{% endblock %}</h1>
+    <h1>{% block title %}Nuevo Trabajo2{% endblock %}</h1>
     <br>
     <h2>Trabajo para el paciente: {{ patient.first_name  }} {{ patient.last_name }}</h2>
     <br>
     <p>Doctor: {{ session['user_info']['first_name'] }} {{ session['user_info']['last_name'] }}</p>
     <br>
     <script type="module" src="{{ url_for('static', filename='js/stl-viewer/stl-viewer.js') }}"></script>
-    {% for file_info in uploaded_files_info %}
-    <div>
-        <p>Nombre del archivo: {{ file_info['filename'] }}</p>
-        <p>Tipo de archivo: {{ file_info['file_type'] }}</p>
-        {% if file_info['file_type'] == 'stl' %}
-            <stl-viewer model="{{ url_for('static', filename='uploads/' + file_info['filename']) }}"></stl-viewer>
-            <p>URL del archivo: {{ url_for('static', filename='uploads/' + file_info['filename']) }}</p>
-        {% elif file_info['file_type'] == 'image' %}
-            <img src="{{ url_for('static', filename='uploads/' + file_info['filename']) }}" alt="Imagen del archivo">
-            <p>URL del archivo: {{ url_for('static', filename='uploads/' + file_info['filename']) }}</p>
-        {% endif %}
+    <div class="container">
+        {% for file_info in uploaded_files_info %}
+        <div class="full-img">
+
+            {% if file_info['file_type'] == 'stl' %}
+                <stl-viewer model="{{ url_for('static', filename='uploads/' + file_info['filename']) }}"></stl-viewer>
+                <p>{{ file_info.filename }}</p>
+            {% elif file_info['file_type'] == 'image' %}
+                <img src="{{ url_for('static', filename='uploads/' + file_info['filename']) }}" alt="Imagen del archivo">
+                <p>{{ file_info.filename }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
     </div>
-    <br>
-{% endfor %}
     <form method="post">
         <div class="form-group">
             <table>
@@ -116,12 +116,14 @@
 
             <label for="tooth_type">Tipo de diente:</label>
             <select class="form-control" id="tooth_type" name="tooth_type">
+                <option value="" hidden selected>Selecciona una opción</option>
                 <option value="Natural">Natural</option>
                 <option value="Implante">Implante</option>
             </select>
 
             <label for="job_type">Tipo de trabajo:</label>
             <select class="form-control" id="job_type" name="job_type">
+                <option value="" hidden selected>Selecciona una opción</option>
             {% for job_type in job_type_list %}
                 <option value="{{ job_type }}">{{ job_type }}</option>
             {% endfor %}
@@ -129,6 +131,7 @@
 
             <label for="job_material">Material de trabajo:</label>
             <select class="form-control" id="job_material" name="job_material">
+                <option value="" hidden selected>Selecciona una opción</option>
             {% for job_material in job_material_list %}
                 <option value="{{ job_material }}">{{ job_material }}</option>
             {% endfor %}
@@ -136,6 +139,7 @@
 
             <label for="job_option">Opción de trabajo:</label>
             <select class="form-control" id="job_option" name="job_option">
+                <option value="" hidden selected>Selecciona una opción</option>
                 <option value="Monolítico">Monolítico</option>
                 <option value="Estratificado">Estratificado</option>
             </select>
@@ -149,5 +153,4 @@
             <button type="submit" class="btn btn-primary">Publicar</button>
         </div>
     </form>
-   
 {% endblock %}

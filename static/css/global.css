@@ -1,0 +1,21 @@
+body{
+    height: 100vh;
+    margin: revert;
+}
+
+.container{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+
+.full-img {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+  }
+  .login__button{
+    display: flex;
+    justify-content: center;
+  }

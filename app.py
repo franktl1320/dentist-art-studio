@@ -1,5 +1,5 @@
 import os
-from helpers import apology, login_required, get_db_connection, get_user_info, get_patients, get_jobs, get_files_by_job_id
+from helpers import apology, login_required, get_db_connection, get_user_info, get_patients, get_jobs, get_files_by_job_id, get_job
 from flask import Flask, render_template, request, url_for, flash, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
@@ -8,6 +8,10 @@ from flask_session import Session
 UPLOAD_FOLDER = 'static/uploads'
 IMAGE_ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 STL_ALLOWED_EXTENSIONS = {'stl'}
+UPPER_JAW = ['18', '17', '16', '15', '14', '13', '12', '11', '21', '22', '23', '24', '25', '26', '27', '28']
+LOWER_JAW = ['48', '47', '46', '45', '44', '43', '42', '41', '31', '32', '33', '34', '35', '36', '37', '38']
+JOB_TYPE_LIST = ['Corona', 'Carilla', 'Incrustación', 'Encerado']
+JOB_MATERIAL_LIST =['Metal-Cerámica', 'E-Max', 'Zirconia', 'Ceromero', 'P.M.M.A.']
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
@@ -35,6 +39,7 @@ def index():
                     files = get_files_by_job_id(job['id'])
                     job['files'] = files
                 jobs_per_patient[patient['id']] = jobs
+                
     else:
         patients = []
     return render_template('index.html', user=user, patients=patients, jobs_per_patient=jobs_per_patient) 
@@ -204,8 +209,6 @@ def add_patient():
 @app.route('/add_job/<int:patient_id>', methods=('GET','POST'))
 @login_required
 def add_job(patient_id):
-    JOB_TYPE_LIST = ['Corona', 'Carilla', 'Incrustación', 'Encerado']
-    JOB_MATERIAL_LIST =['Metal-Cerámica', 'E-Max', 'Zirconia', 'Ceromero', 'P.M.M.A.']
     patients = get_patients(session.get("user_id"))
     patient = next((patient for patient in patients if patient['id'] == patient_id), None) 
     uploaded_files_info = session.get('uploaded_files_info', [])
@@ -341,10 +344,64 @@ from flask import send_from_directory
 def download(name):
     return send_from_directory(app.config["UPLOAD_FOLDER"], name)
 
-#@app.route('/preview_stl')
-#def preview_stl_files():
-    stl_files = os.listdir(app.config["UPLOAD_FOLDER"])
-    stl_file_urls = [url_for('static', filename=os.path.join('uploads/', name)) for name in stl_files]
-    stl_download_urls = [url_for('download_stl', name=name) for name in stl_files]
-    file_data = zip(stl_file_urls, stl_download_urls, stl_files)
-    return render_template('preview_stl.html', file_data=file_data)
+@app.route('/<int:job_id>/preview')
+@login_required
+def preview(job_id):
+    files = get_files_by_job_id(job_id)
+    job = get_job(job_id)
+    checked_teeth = job['teeth'].split(', ')
+    patient_id = job['patient_id']
+    patients = get_patients(session.get("user_id"))
+    patient = next((p for p in patients if p['id'] == patient_id), None)
+    return render_template('preview.html', job=job, patient=patient, files=files,upper_jaw=UPPER_JAW,lower_jaw=LOWER_JAW, checked_teeth=checked_teeth)
+
+@app.route('/<int:job_id>/edit', methods=('GET','POST'))
+@login_required
+def edit_job(job_id):
+    files = get_files_by_job_id(job_id)
+    job = get_job(job_id)
+    checked_teeth = job['teeth'].split(', ')
+    patient_id = job['patient_id']
+    patients = get_patients(session.get("user_id"))
+    patient = next((p for p in patients if p['id'] == patient_id), None)
+    if request.method == 'POST':
+        teeth = request.form.getlist('teeth')
+        if not teeth:
+            flash('Debe seleccionar al menos un diente')
+            return redirect(url_for('edit_job', job_id=job_id))
+        teeth_string = ', '.join(teeth)
+        comments = request.form.get('comments')
+        tooth_type = request.form.get('tooth_type')
+        job_type = request.form.get('job_type')
+        job_material = request.form.get('job_material')
+        job_option = request.form.get('job_option')
+        try:
+            conn = get_db_connection()
+            db = conn.cursor()
+            db.execute(
+                'UPDATE jobs SET teeth = ?, comments = ?, tooth_type = ?, job_type = ?, job_material = ?, job_option = ? WHERE id = ?',
+                (teeth_string, comments, tooth_type, job_type, job_material, job_option, job_id)
+            )
+            conn.commit()
+            conn.close()
+            flash('Trabajo actualizado exitosamente!')
+            return redirect(url_for('index'))
+        except Exception as e:
+            return apology("Ocurrió un error al actualizar el trabajo")      
+    return render_template('edit_job.html', job=job, patient=patient, files=files, upper_jaw=UPPER_JAW, lower_jaw=LOWER_JAW, job_type_list=JOB_TYPE_LIST, job_material_list=JOB_MATERIAL_LIST, checked_teeth=checked_teeth)
+
+@app.route('/<int:job_id>/delete', methods=('POST',))
+@login_required
+def delete_job(job_id):
+    try:
+        conn = get_db_connection()
+        db = conn.cursor()
+        db.execute('DELETE FROM job_uploads WHERE job_id = ?', (job_id,))
+        db.execute('DELETE FROM jobs WHERE id = ?', (job_id,))
+        conn.commit()
+        conn.close()
+        flash('Trabajo eliminado exitosamente!')
+        return redirect(url_for('index'))
+    except Exception as e:
+        return apology("Ocurrió un error al eliminar el trabajo")
+    
