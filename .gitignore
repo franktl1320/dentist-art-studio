@@ -4,3 +4,7 @@ __pycache__/
 flask_session/
 uploads/*
 !uploads/.gitkeep
+
+# Ignorar archivos de base de datos
+*.db
+*.sqlite
