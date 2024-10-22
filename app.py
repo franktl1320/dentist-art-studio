@@ -405,3 +405,26 @@ def delete_job(job_id):
     except Exception as e:
         return apology("Ocurrió un error al eliminar el trabajo")
     
+@app.route('/<int:job_id>/delete_file/<int:upload_id>', methods=('POST',))
+@login_required
+def delete_file(job_id, upload_id):
+    try:
+        conn = get_db_connection()
+        db = conn.cursor()
+        db.execute('DELETE FROM job_uploads WHERE job_id = ? AND upload_id = ?', (job_id, upload_id))
+        db.execute('DELETE FROM uploads WHERE id = ?', (upload_id,))
+        conn.commit()
+        conn.close()
+        flash('Archivo eliminado exitosamente!')
+          # Obtener la URL de la página anterior desde la cabecera Referer
+        previous_url = request.headers.get('Referer')
+        
+        # Redirigir a la página anterior si está disponible, de lo contrario redirigir a 'edit_job'
+        if previous_url:
+            return redirect(previous_url)
+        else:
+            return redirect(url_for('edit_job', job_id=job_id))
+    except Exception as e:
+        return apology("Ocurrió un error al eliminar el archivo")
+    
+    
