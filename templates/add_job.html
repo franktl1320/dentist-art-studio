@@ -12,14 +12,12 @@
     <div class="container">
         {% for file_info in uploaded_files_info %}
         <div class="full-img">
-
             {% if file_info['file_type'] == 'stl' %}
-                <stl-viewer model="{{ url_for('static', filename='uploads/' + file_info['filename']) }}"></stl-viewer>
-                <p>{{ file_info.filename }}</p>
+            <stl-viewer model="{{ url_for('static', filename='uploads/' + file_info['filename']) }}"></stl-viewer>
             {% elif file_info['file_type'] == 'image' %}
-                <img src="{{ url_for('static', filename='uploads/' + file_info['filename']) }}" alt="Imagen del archivo">
-                <p>{{ file_info.filename }}</p>
+            <img src="{{ url_for('static', filename='uploads/' + file_info['filename']) }}" alt="Imagen del archivo">
             {% endif %}
+            <p>{{ file_info.filename }}</p>
         </div>
         {% endfor %}
     </div>
