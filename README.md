@@ -17,7 +17,21 @@ git clone https://github.com/franktl1320/dentist-art-studio.git
 cd dentist-art-studio
 
 ```
+## Configuración del Entorno Virtual
 
+Antes de ejecutar el proyecto, asegúrate de crear un entorno virtual de Python e instalar las dependencias necesarias:
+
+```bash
+# Crear un entorno virtual
+python3 -m venv environments
+
+# Activar el entorno virtual
+source environments/bin/activate  # En Linux/macOS
+# environments\Scripts\activate   # En Windows
+
+# Instalar las dependencias
+pip install -r requirements.txt
+```
 ## Configuración de la Base de Datos
 
 Para configurar la base de datos localmente, sigue estos pasos:
